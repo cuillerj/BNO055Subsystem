@@ -467,8 +467,21 @@ void loop() {
             LOCAL_CTRL_REG[relativeHeading_Reg1] = 0x00;
             LOCAL_CTRL_REG[relativeHeading_Reg2] = 0x00;
             LOCAL_CTRL_REG[relativeHeading_Reg3] = 0x00;
+            LOCAL_CTRL_REG[forwardBackward_reg] = dataIn[2];
+#if defined(debugOn)
             Serial.print("StartInitGyro:");
-            Serial.println(startHeading);
+            Serial.print(startHeading);
+            Serial.print(" ");
+            Serial.print(dataIn[2], HEX);
+            if (dataIn[2])
+            {
+              Serial.println(" Forward");
+            }
+            else
+            {
+              Serial.println(" Backward");
+            }
+#endif
             bitWrite(currentStatus, monitGyroStatusBit, 1);
             interruptCount = 0;
             break;
@@ -517,10 +530,15 @@ void loop() {
     //   uint16_t deltaRightPosX = (uint16_t)LOCAL_CTRL_REG[deltaRightPosX_reg1] << 8 | (uint16_t) LOCAL_CTRL_REG[deltaRightPosX_reg2];
     //  uint16_t deltaRightPosY = (uint16_t)LOCAL_CTRL_REG[deltaRightPosY_reg1] << 8 | (uint16_t) LOCAL_CTRL_REG[deltaRightPosY_reg2];
     locationHeadingRad = ((int)(360 - RobotRotationClockWise * locationHeading) % 360) * PI / 180;   // convert & adjust rotation sens
-    fDeltaLeftPosX = fDeltaLeftPosX + ((float)(LOCAL_CTRL_REG[leftDistance_Reg])) * cos(RobotRotationClockWise * locationHeadingRad );
-    fDeltaLeftPosY = fDeltaLeftPosY + ((float)(LOCAL_CTRL_REG[leftDistance_Reg])) * sin(RobotRotationClockWise * locationHeadingRad );
-    fDeltaRightPosX = fDeltaRightPosX + ((float)LOCAL_CTRL_REG[rightDistance_Reg]) * cos(RobotRotationClockWise * locationHeadingRad );
-    fDeltaRightPosY = fDeltaRightPosY + ((float)LOCAL_CTRL_REG[rightDistance_Reg]) * sin(RobotRotationClockWise * locationHeadingRad );
+    int forward=1;
+    if (LOCAL_CTRL_REG[forwardBackward_reg]==0x00)
+    {
+      forward=-1;
+    }
+    fDeltaLeftPosX = fDeltaLeftPosX + ((float)(LOCAL_CTRL_REG[leftDistance_Reg])) * forward * cos(RobotRotationClockWise * locationHeadingRad );
+    fDeltaLeftPosY = fDeltaLeftPosY + ((float)(LOCAL_CTRL_REG[leftDistance_Reg])) * forward * sin(RobotRotationClockWise * locationHeadingRad );
+    fDeltaRightPosX = fDeltaRightPosX + ((float)LOCAL_CTRL_REG[rightDistance_Reg]) * forward * cos(RobotRotationClockWise * locationHeadingRad );
+    fDeltaRightPosY = fDeltaRightPosY + ((float)LOCAL_CTRL_REG[rightDistance_Reg]) * forward * sin(RobotRotationClockWise * locationHeadingRad );
 #if defined(debugOn)
     //   Serial.println(fDeltaLeftPosX);
     //   Serial.println(fDeltaLeftPosY);
