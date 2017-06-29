@@ -38,9 +38,9 @@ unsigned long UpdateLEDStatus_time;
 float X;
 float Y = 0;
 int NOBeforeRotation = 0; // keep NO before rotation
-int NOAfterRotation = 0;
+int NOAfterRotation = 0;  // keep NO after rotation
 int NOBeforeMoving = 0; // keep NO before moving straight
-int NOAfterMoving = 0; // keep NO before moving straight
+int NOAfterMoving = 0; // keep NO after moving straight
 // compass calibration to be made
 
 volatile boolean dataToRead = false;
